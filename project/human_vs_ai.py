@@ -35,7 +35,7 @@ def draw_grid(markers, red_points, blue_points, size=100):
             #     pygame.draw.rect(screen, BLACK, rect)
     pygame.display.update()
 
-def human_vs_ai(model, data, size=100, cell_size=5, num_turns=5, quarantine_distance=20, start="model"):
+def human_vs_ai(model, data, size=100, cell_size=5, num_turns=5, quarantine_distance=5, start="model"):
     """Simulate a game and return the final grid and outcome."""
     grid = initialize_grid(size)
     markers = []

@@ -100,7 +100,7 @@ def human_vs_ai(model, data, size=100, cell_size=5, num_turns=5, quarantine_dist
 
 
 if __name__ == "__main__":
-    data = pd.read_csv("voronoi_data.csv")
+    data = pd.read_csv("knn_data1_10.csv.csv")
     outcome, red_percentage, blue_percentage = human_vs_ai(model=model, data=data, size=size, cell_size=cell_size)
     # pygame.quit()
     # sys.exit()

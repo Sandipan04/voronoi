@@ -28,19 +28,37 @@ def place_marker(grid, x, y, player):
 def calculate_voronoi_points(grid, red_markers, blue_markers):
     """Calculate the red and blue points based on the Voronoi diagram."""
     size = grid.shape[0]
-    red_markers = np.array(red_markers)
-    blue_markers = np.array(blue_markers)
 
-    empty_points = np.argwhere(np.all(grid == 0, axis=2))
+    if len(blue_markers) == 0:
+        red_markers = np.array(red_markers)
+        empty_points = np.argwhere(np.all(grid == 0, axis=2))
+        red_points = np.zeros((size, size), dtype=bool)
+        blue_points = np.zeros((size, size), dtype=bool)
+        red_points[empty_points[:, 0], empty_points[:, 1]] = True
+        blue_points[empty_points[:, 0], empty_points[:, 1]] = False
 
-    red_dist = np.sqrt(np.sum((empty_points[:, np.newaxis, :] - red_markers[np.newaxis, :, :]) ** 2, axis=2)).min(axis=1)
-    blue_dist = np.sqrt(np.sum((empty_points[:, np.newaxis, :] - blue_markers[np.newaxis, :, :]) ** 2, axis=2)).min(axis=1)
+    elif len(red_markers) == 0:
+        blue_markers = np.array(red_markers)
+        empty_points = np.argwhere(np.all(grid == 0, axis=2))
+        red_points = np.zeros((size, size), dtype=bool)
+        blue_points = np.zeros((size, size), dtype=bool)
+        red_points[empty_points[:, 0], empty_points[:, 1]] = False
+        blue_points[empty_points[:, 0], empty_points[:, 1]] = True
+        
+    else:
+        red_markers = np.array(red_markers)
+        blue_markers = np.array(blue_markers)
 
-    red_points = np.zeros((size, size), dtype=bool)
-    blue_points = np.zeros((size, size), dtype=bool)
+        empty_points = np.argwhere(np.all(grid == 0, axis=2))
 
-    red_points[empty_points[:, 0], empty_points[:, 1]] = red_dist < blue_dist
-    blue_points[empty_points[:, 0], empty_points[:, 1]] = blue_dist < red_dist
+        red_dist = np.sqrt(np.sum((empty_points[:, np.newaxis, :] - red_markers[np.newaxis, :, :]) ** 2, axis=2)).min(axis=1)
+        blue_dist = np.sqrt(np.sum((empty_points[:, np.newaxis, :] - blue_markers[np.newaxis, :, :]) ** 2, axis=2)).min(axis=1)
+
+        red_points = np.zeros((size, size), dtype=bool)
+        blue_points = np.zeros((size, size), dtype=bool)
+
+        red_points[empty_points[:, 0], empty_points[:, 1]] = red_dist < blue_dist
+        blue_points[empty_points[:, 0], empty_points[:, 1]] = blue_dist < red_dist
 
     return red_points, blue_points
 
@@ -77,6 +95,10 @@ def simulate_game(size=100, num_turns=5, quarantine_distance=5):
         player = 2 if player == 1 else 1  # Switch player
 
     red_points, blue_points = calculate_voronoi_points(grid, red_markers, blue_markers)
+    # print(red_points)
+    # print()
+    # print(blue_points)
+    # pint()
     red_percentage, blue_percentage = calculate_area_percentage(red_points, blue_points)
 
     # if red_percentage > blue_percentage:
@@ -103,5 +125,7 @@ if __name__ =="__main__":
     num_turns = 5
     quarantine_distance = 5
 
-    dataset = generate_dataset(num_games, size, num_turns, quarantine_distance)
-    dataset.to_csv('voronoi_data.csv', index=False)
+    # dataset = generate_dataset(num_games, size, num_turns, quarantine_distance)
+    # dataset.to_csv('voronoi_data.csv', index=False)
+
+    simulate_game()

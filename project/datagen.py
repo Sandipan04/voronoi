@@ -17,7 +17,9 @@ def is_valid_move(grid, x, y, quarantine_distance, player):
         return False
     for i in range(size):
         for j in range(size):
-            if grid[i, j, player] != 0 and np.sqrt((i - x)**2 + (j - y)**2) < quarantine_distance:
+            if grid[i, j, 0] != 0 and ((i - x)**2 + (j - y)**2)**(0.5) <= quarantine_distance:
+                return False
+            if grid[i, j, 1] != 0 and ((i - x)**2 + (j - y)**2)**(0.5) <= quarantine_distance:
                 return False
     return True
 
@@ -29,7 +31,15 @@ def calculate_voronoi_points(grid, red_markers, blue_markers):
     """Calculate the red and blue points based on the Voronoi diagram."""
     size = grid.shape[0]
 
-    if len(blue_markers) == 0:
+    if len(blue_markers) == 0 and len(red_markers) == 0:
+        red_markers = np.array(red_markers)
+        empty_points = np.argwhere(np.all(grid == 0, axis=2))
+        red_points = np.zeros((size, size), dtype=bool)
+        blue_points = np.zeros((size, size), dtype=bool)
+        red_points[empty_points[:, 0], empty_points[:, 1]] = False
+        blue_points[empty_points[:, 0], empty_points[:, 1]] = False
+
+    elif len(blue_markers) == 0:
         red_markers = np.array(red_markers)
         empty_points = np.argwhere(np.all(grid == 0, axis=2))
         red_points = np.zeros((size, size), dtype=bool)
@@ -95,18 +105,7 @@ def simulate_game(size=100, num_turns=5, quarantine_distance=5):
         player = 2 if player == 1 else 1  # Switch player
 
     red_points, blue_points = calculate_voronoi_points(grid, red_markers, blue_markers)
-    # print(red_points)
-    # print()
-    # print(blue_points)
-    # pint()
     red_percentage, blue_percentage = calculate_area_percentage(red_points, blue_points)
-
-    # if red_percentage > blue_percentage:
-    #     outcome = "win"  # Red player wins
-    # elif red_percentage < blue_percentage:
-    #     outcome = "loss"  # Blue player wins
-    # else:
-    #     outcome = "tie"  # Tie
 
     return markers + [red_percentage, blue_percentage]
 

@@ -2,15 +2,13 @@ from sklearn.neighbors import NearestNeighbors
 import pandas as pd
 import numpy as np
 
-data = pd.read_csv("voronoi_data.csv")
-
 def column_selector(t, column_headers):
     features = column_headers[:t]
     label = column_headers[t]
     area = column_headers[-1] if t%2==1 else column_headers[-2]
     return features, label, area
 
-def model(current_state:list, data):
+def model(current_state:list, data, red_points):
     t = len(current_state)
     if t == 0:
         y = data["Area_P1"] # outcome of the t+1-th player
@@ -40,9 +38,15 @@ def model(current_state:list, data):
 
     #  Analyze the historical success of t+1-th move in these neighbors
     move_scores = {}
+    size = 100
     for index in indices:
         move = next_move_set.iloc[index]
         area_control = y.iloc[index]
+
+        a, b = divmod(move, size)
+        if red_points[a][b] == True:
+            area_control -= 10
+
         if move in move_scores:
             move_scores[move].append(area_control)
         else:
@@ -51,5 +55,3 @@ def model(current_state:list, data):
     best_move = max(move_scores, key=lambda x: np.mean(move_scores[x]))  # select move with highest average outcome
 
     return best_move
-
-print(model([1234, 5678, 4602], data))
